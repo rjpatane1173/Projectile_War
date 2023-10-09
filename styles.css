@@ -28,11 +28,11 @@ body {
 }
 
 #arrow-indicator {
-    font-size: 30px; /* Adjust the font size as needed */
+    font-size: 26px; /* Adjust the font size as needed */
     color: #00f; /* Blue color for the angular bracket */
     position: absolute;
-    top: 40%;
-    left: 40%;
+    top: 10%;
+    left: 10%;
     transform: translate(-50%, -50%) rotate(0deg); /* Initial rotation */
 }
 
