@@ -33,7 +33,7 @@ body {
     position: absolute;
     top: 10%;
     left: 10%;
-    transform: translate(-10%, -10%) rotate(0deg); /* Initial rotation */
+    transform: translate(-50%, -50%) rotate(0deg); /* Initial rotation */
 }
 
 #controls {
