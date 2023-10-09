@@ -1,0 +1,61 @@
+// Get DOM elements
+const player = document.getElementById("player");
+const gameContainer = document.getElementById("game-container");
+const arrowIndicator = document.getElementById("arrow-indicator");
+
+// Initialize player position and rotation
+let playerX = 50; // Initial player position (X-coordinate)
+let playerY = 50; // Initial player position (Y-coordinate)
+const playerSpeed = 5; // Adjust the player's movement speed as needed
+let playerRotation = 0; // Player's rotation angle (in degrees)
+
+// Function to update player's position
+function updatePlayerPosition() {
+    player.style.left = `${playerX}px`;
+    player.style.top = `${playerY}px`;
+}
+
+// Function to update arrow indicator's rotation
+function updateArrowIndicatorRotation(rotation) {
+    arrowIndicator.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+}
+
+// Function to handle arrow key events
+function handleArrowKey(keyCode) {
+    let radians;
+
+    switch (keyCode) {
+        case 37: // Left arrow key
+            playerRotation -= 15; // Rotate counterclockwise
+            updateArrowIndicatorRotation(playerRotation);
+            break;
+
+        case 39: // Right arrow key
+            playerRotation += 15; // Rotate clockwise
+            updateArrowIndicatorRotation(playerRotation);
+            break;
+
+        case 38: // Up arrow key
+            radians = (playerRotation * Math.PI) / 180;
+            playerX += playerSpeed * Math.cos(radians);
+            playerY -= playerSpeed * Math.sin(radians);
+            updatePlayerPosition();
+            break;
+
+        case 40: // Down arrow key
+            radians = (playerRotation * Math.PI) / 180;
+            playerX -= playerSpeed * Math.cos(radians);
+            playerY += playerSpeed * Math.sin(radians);
+            updatePlayerPosition();
+            break;
+    }
+}
+
+// Event listener for arrow key presses
+document.addEventListener("keydown", (event) => {
+    handleArrowKey(event.keyCode);
+});
+
+// Set initial rotation and position
+updateArrowIndicatorRotation(playerRotation);
+updatePlayerPosition();

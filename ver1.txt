@@ -1,0 +1,88 @@
+const player = document.getElementById("player");
+const gameContainer = document.getElementById("game-container");
+
+let playerX = 50; // Initial player position (X-coordinate)
+let playerY = 50; // Initial player position (Y-coordinate)
+const playerSpeed = 5; // Adjust the player's movement speed as needed
+let playerRotation = 0; // Player's rotation angle (in degrees)
+
+function updatePlayerPosition() {
+    player.style.left = `${playerX}px`;
+    player.style.top = `${playerY}px`;
+    player.style.transform = `rotate(${playerRotation}deg)`;
+}
+
+function handleArrowKey(keyCode) {
+    switch (keyCode) {
+        case 37: // Left arrow key
+            playerRotation -= 15; // Rotate counterclockwise
+            break;
+        case 39: // Right arrow key
+            playerRotation += 15; // Rotate clockwise
+            break;
+        case 38: // Up arrow key
+            // Calculate new X and Y coordinates based on player's rotation
+            const radians = (playerRotation * Math.PI) / 180;
+            playerX += playerSpeed * Math.cos(radians);
+            playerY -= playerSpeed * Math.sin(radians);
+            break;
+        case 40: // Down arrow key
+            // Calculate new X and Y coordinates based on player's rotation
+            const radians = (playerRotation * Math.PI) / 180;
+            playerX -= playerSpeed * Math.cos(radians);
+            playerY += playerSpeed * Math.sin(radians);
+            break;
+    }
+    updatePlayerPosition();
+}
+
+document.addEventListener("keydown", (event) => {
+    handleArrowKey(event.keyCode);
+});
+
+// Add event listeners for the control buttons
+document.getElementById("rotate-ccw").addEventListener("click", () => {
+    playerRotation -= 15; // Rotate counterclockwise
+    updatePlayerPosition();
+});
+
+document.getElementById("rotate-cw").addEventListener("click", () => {
+    playerRotation += 15; // Rotate clockwise
+    updatePlayerPosition();
+});
+
+updatePlayerPosition();
+
+
+const arrowIndicator = document.getElementById("arrow-indicator");
+
+function updateArrowIndicatorRotation(rotation) {
+    arrowIndicator.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+}
+
+function handleArrowKey(keyCode) {
+    switch (keyCode) {
+        // ... Your previous arrow key handling ...
+
+        case 38: // Up arrow key
+            // Calculate new X and Y coordinates based on player's rotation
+            const radians = (playerRotation * Math.PI) / 180;
+            playerX += playerSpeed * Math.cos(radians);
+            playerY -= playerSpeed * Math.sin(radians);
+            updateArrowIndicatorRotation(playerRotation);
+            break;
+
+        case 40: // Down arrow key
+            // Calculate new X and Y coordinates based on player's rotation
+            const radians = (playerRotation * Math.PI) / 180;
+            playerX -= playerSpeed * Math.cos(radians);
+            playerY += playerSpeed * Math.sin(radians);
+            updateArrowIndicatorRotation(playerRotation);
+            break;
+    }
+    updatePlayerPosition();
+}
+
+// ... Your previous JavaScript code ...
+
+updateArrowIndicatorRotation(playerRotation); // Set initial rotation
