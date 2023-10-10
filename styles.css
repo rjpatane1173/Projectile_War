@@ -16,6 +16,47 @@ body {
     position: relative;
 }
 
+.obstacle {
+    position: absolute;
+    background-color: #888; /* Color of the obstacles */
+}
+
+/* 'L'-shaped obstacle 1 */
+.obstacle1 {
+    left: 20vw;
+    top: 20vh;
+    width: 20vw;
+    height: 2vh;
+}
+
+/* 'L'-shaped obstacle 2 (rotated 45 degrees) */
+.obstacle2 {
+    left: 20vw;
+    top: 50vh;
+    width: 2vh;
+    height: 20vw;
+    transform: rotate(0deg);
+}
+
+/* 'L'-shaped obstacle 3 (rotated 90 degrees) */
+.obstacle3 {
+    left: 60vw;
+    top: 30vh;
+    width: 20vw;
+    height: 2vh;
+    transform: rotate(90deg);
+}
+
+/* 'L'-shaped obstacle 4 (rotated 135 degrees) */
+.obstacle4 {
+    right: 20vw;
+    bottom: 1vh;
+    width: 2vh;
+    height: 20vw;
+    transform: rotate(90deg);
+}
+
+
 #player {
     width: 5%;
     height: 5%;
@@ -37,73 +78,62 @@ body {
 }
 
  /* this section works fine from this line onwards*/
-/* 
-#controls {
+ #controls{
+    display: flex;
+    flex-wrap: wrap;
+ }
+
+#controls #rotate-ccw {
     display: flex;
     flex-direction: column;
     position: absolute;
-    bottom: 0;
-    left: 0;
     padding: 10px;
+    right: 5px;
+    bottom: 5px;
+    user-select: none;
 }
+
+#controls #move-left {
+    display: flex;
+    position: absolute;
+    padding: 10px;
+    left: 10px;
+    bottom: 20px;
+    user-select: none;
+}
+
+
+#controls #move-down {
+    display: flex;
+    position: absolute;
+    padding: 10px;
+    left: 60px;
+    bottom: 20px;
+    user-select: none;
+}
+
+#controls #move-right {
+    display: flex;
+    position: absolute;
+    padding: 10px;
+    left: 121px;
+    bottom: 20px;
+    user-select: none;
+}
+#controls #move-up{
+    display: flex;
+    position: absolute;
+    padding: 10px;
+    left: 68px;
+    bottom: 63px;
+    user-select: none;
+}
+
 
 button {
     margin: 5px;
 }
-*/
- /* this section works fine from 38 line onwards*/
-#controls {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    align-items: flex-end;
-}
 
-#left-button {
-    margin: 5px;
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#up-button,
-#down-button,
-#right-button {
-    margin: 5px;
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#up-button {
-    margin-right: 5px; /* Add space between Up and Right buttons */
-}
-
-#down-button {
-    margin-top: 5px; /* Add space between Down and Right buttons */
-}
-
-#rotate-ccw,
-#rotate-cw {
-    margin: 5px;
-    padding: 10px 20px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#rotate-cw {
-    margin-top: 5px; /* Add space between Rotate CW and Down buttons */
-}
 
 button:hover {
     background-color: #555;
@@ -119,4 +149,14 @@ button:hover {
     transition: transform 0.2s linear; /* Adjust the speed of projectiles as needed */
 }
 
+#rotate-cw {
+    display: none;
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
