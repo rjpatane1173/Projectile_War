@@ -2,6 +2,12 @@ const player = document.getElementById("player");
 const gameContainer = document.getElementById("game-container");
 const arrowIndicator = document.getElementById("arrow-indicator");
 const projectileContainer = document.getElementById("projectile-container"); // Container for projectiles
+// try start
+const obstacles = document.querySelectorAll('.obstacle');
+const projectiles = []; // Array to store projectiles
+
+// try end
+
 
 let playerX = 150; // Initial player position (X-coordinate) within the game container
 let playerY = 150; // Initial player position (Y-coordinate) within the game container
@@ -9,28 +15,62 @@ const playerSpeed = 5; // Adjust the player's movement speed as needed
 const projectileSpeed = 10; // Speed of projectiles (adjust as needed)
 let playerRotation = 0; // Player's rotation angle (in degrees)
 
+// try start
+function checkProjectileObstacleCollision() {
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        const projectile = projectiles[i];
+        const projectileRect = projectile.getBoundingClientRect();
+
+        obstacles.forEach((obstacle) => {
+            const obstacleRect = obstacle.getBoundingClientRect();
+
+            if (
+                projectileRect.left < obstacleRect.right &&
+                projectileRect.right > obstacleRect.left &&
+                projectileRect.top < obstacleRect.bottom &&
+                projectileRect.bottom > obstacleRect.top
+            ) {
+                // Collision detected with an obstacle
+
+                // Remove the projectile
+                projectileContainer.removeChild(projectile);
+                projectiles.splice(i, 1);
+            }
+        });
+    }
+}
+
+// try ends
+
 function updatePlayerPosition() {
     playerX = Math.max(0, Math.min(gameContainer.clientWidth - player.clientWidth, playerX));
     playerY = Math.max(0, Math.min(gameContainer.clientHeight - player.clientHeight, playerY));
 
     player.style.left = `${playerX}px`;
     player.style.top = `${playerY}px`;
+
 }
 
-function updateArrowIndicatorRotation(rotation) {
-    arrowIndicator.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-}
+
+
 
 function updateArrowIndicatorPosition() {
     arrowIndicator.style.left = `${playerX}px`;
     arrowIndicator.style.top = `${playerY}px`;
 }
 
+function updateArrowIndicatorRotation(rotation) {
+    arrowIndicator.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+}
+
+
+
 function handleArrowKey(keyCode) {
     let radians;
 
     switch (keyCode) {
         case 37: // Left arrow key
+           
             if (playerRotation !== 180) {
                 playerRotation = 180; // Rotate counterclockwise
                 updateArrowIndicatorRotation(playerRotation);
@@ -38,6 +78,8 @@ function handleArrowKey(keyCode) {
                 playerX -= playerSpeed; // Move left
                 updatePlayerPosition();
                 updateArrowIndicatorPosition();
+                checkCollisions();
+
             }
             break;
 
@@ -100,13 +142,15 @@ document.addEventListener("keydown", (event) => {
         // Append the projectile to the container
         projectileContainer.appendChild(projectile);
 
+        // Add the projectile to the array
+        projectiles.push(projectile);
+
         // Move the projectile in the direction of the player's rotation
         moveProjectile(projectile, xSpeed, ySpeed);
     }
 });
 
 
-// if this that doesnt work then remove the comment from here till 130 line
 // Button event listeners to mimic arrow keys
 /*
 const moveUpButton = document.getElementById("move-up");
@@ -270,7 +314,7 @@ rotateCCWButton.addEventListener("click", () => {
     moveProjectile(projectile, xSpeed, ySpeed);
 });
 */
-
+/*
 // try
 const rotateCCWButton = document.getElementById("rotate-ccw");
 let isMouseDownCCW = false;
@@ -313,9 +357,73 @@ rotateCCWButton.addEventListener("mousedown", () => {
 rotateCCWButton.addEventListener("mouseup", () => {
     isMouseDownCCW = false;
 });
+*/
 
+//try start for fire button 11:20pm
+const rotateCCWButton = document.getElementById("rotate-ccw");
+let isMouseDownCCW = false;
+let isTouchStartCCW = false;
 
-//try
+rotateCCWButton.addEventListener("mousedown", () => {
+    isMouseDownCCW = true;
+    startRotation(); // Start rotation when the mouse button is pressed
+});
+
+rotateCCWButton.addEventListener("mouseup", () => {
+    isMouseDownCCW = false;
+    stopRotation(); // Stop rotation when the mouse button is released
+});
+
+rotateCCWButton.addEventListener("touchstart", (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    isTouchStartCCW = true;
+    startRotation(); // Start rotation when touch starts
+});
+
+rotateCCWButton.addEventListener("touchend", () => {
+    isTouchStartCCW = false;
+    stopRotation(); // Stop rotation when touch ends
+});
+
+function startRotation() {
+    // Continuously perform the action as long as the button is pressed or touched
+    const intervalIdCCW = setInterval(() => {
+        if (!isMouseDownCCW && !isTouchStartCCW) {
+            clearInterval(intervalIdCCW); // Stop the action when the button is released or touch ends
+        } else {
+            // Simulate the Spacebar press to fire a projectile
+            const radians = (playerRotation * Math.PI) / 180;
+            const projectile = document.createElement("div");
+            projectile.className = "projectile";
+
+            // Calculate the initial position of the projectile relative to the player's center
+            const projectileRadius = 5; // Adjust the radius of the projectile as needed
+            const projectileX = playerX - projectileRadius;
+            const projectileY = playerY - projectileRadius;
+
+            projectile.style.left = `${projectileX}px`;
+            projectile.style.top = `${projectileY}px`;
+
+            // Calculate the speed components based on player rotation
+            const xSpeed = projectileSpeed * Math.cos(radians); // Adjust the sign here
+            const ySpeed = projectileSpeed * Math.sin(radians); // Adjust the sign here
+
+            // Append the projectile to the container
+            projectileContainer.appendChild(projectile);
+
+            // Move the projectile in the direction of the player's rotation
+            moveProjectile(projectile, xSpeed, ySpeed);
+        }
+    }, 100); // Adjust the interval duration as needed
+}
+
+function stopRotation() {
+    // Stop the action when the button is released or touch ends
+    isMouseDownCCW = false;
+    isTouchStartCCW = false;
+}
+
+// try ends
 
 const rotateCWButton = document.getElementById("rotate-cw");
 rotateCWButton.addEventListener("click", () => {
@@ -392,3 +500,27 @@ function moveright() {
 updateArrowIndicatorRotation(playerRotation);
 updatePlayerPosition();
 updateArrowIndicatorPosition();
+checkProjectileObstacleCollision(); // Check for projectile-obstacle collisions
+requestAnimationFrame(gameLoop); // Continue the loop
+
+
+// try start 10 oct
+
+// Other game-related functions and variables
+
+function gameLoop() {
+    updateArrowIndicatorRotation(playerRotation);
+updatePlayerPosition();
+updateArrowIndicatorPosition();
+
+    checkProjectileObstacleCollision(); // Check for projectile-obstacle collisions
+
+    // ... Other game-related logic ...
+
+    requestAnimationFrame(gameLoop); // Continue the loop
+}
+
+// Start the game loop
+gameLoop();
+
+// try ends 10 oct 
