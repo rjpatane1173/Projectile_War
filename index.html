@@ -5,23 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobile Game Controls</title>
     <link rel="stylesheet" href="styles.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
 </head>
 <body>
     <div id="game-container">
         <div id="player"></div>
         <div id="arrow-indicator">></div>
         <div id="projectile-container"></div>
+        <!-- 'L'-shaped obstacles -->
+        <div class="obstacle obstacle1"></div>
+        <div class="obstacle obstacle2"></div>
+        <div class="obstacle obstacle3"></div>
+        <div class="obstacle obstacle4"></div>
+           
     </div>
-    <div id="controls">
+
+<div id="controls">
         <button id="move-up">Up</button>
         <button id="move-down">Down</button>
         <button id="move-left">Left</button>
         <button id="move-right">Right</button>
         <button id="rotate-ccw">Fire</button>
         <button id="rotate-cw">Rotate CW</button>
-    </div>
+</div>
+
     <script src="game.js"></script>
 </body>
 </html>
