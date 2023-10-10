@@ -105,28 +105,145 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
+
+// if this that doesnt work then remove the comment from here till 130 line
 // Button event listeners to mimic arrow keys
+/*
 const moveUpButton = document.getElementById("move-up");
-moveUpButton.addEventListener("click", () => {
+moveUpButton.addEventListener("mousedown", () => {
     handleArrowKey(38); // Simulate the up arrow key press
 });
+*/
 
+// this is try and guess what it worked
+const moveUpButton = document.getElementById("move-up");
+let isMouseDown = false;
+
+moveUpButton.addEventListener("mousedown", () => {
+    isMouseDown = true;
+
+    // Start the action immediately when the mouse button is pressed
+    handleArrowKey(38);
+
+    // Repeatedly perform the action as long as the mouse button is held down
+    const intervalId = setInterval(() => {
+        if (isMouseDown) {
+            handleArrowKey(38); // Simulate the up arrow key press
+        } else {
+            clearInterval(intervalId); // Stop the action when the mouse button is released
+        }
+    }, 100); // Adjust the interval duration as needed
+});
+
+moveUpButton.addEventListener("mouseup", () => {
+    isMouseDown = false;
+});
+
+// this is try 
+/*
+moveUpButton.addEventListener("mouseout", () => {
+    // Stop the action if the mouse pointer moves out of the button while the button is pressed
+    clearInterval(moveUpInterval);
+})
+*/
+/*
 const moveDownButton = document.getElementById("move-down");
-moveDownButton.addEventListener("click", () => {
+moveDownButton.addEventListener("mousedown", () => {
     handleArrowKey(40); // Simulate the down arrow key press
 });
+*/
+const moveDownButton = document.getElementById("move-down");
+let isMouseDownDown = false;
+
+moveDownButton.addEventListener("mousedown", () => {
+    isMouseDownDown = true;
+
+    // Start the action immediately when the mouse button is pressed
+    handleArrowKey(40);
+
+    // Repeatedly perform the action as long as the mouse button is held down
+    const intervalIdDown = setInterval(() => {
+        if (isMouseDownDown) {
+            handleArrowKey(40); // Simulate the down arrow key press
+        } else {
+            clearInterval(intervalIdDown); // Stop the action when the mouse button is released
+        }
+    }, 100); // Adjust the interval duration as needed
+});
+
+moveDownButton.addEventListener("mouseup", () => {
+    isMouseDownDown = false;
+});
+
+/*
 
 const moveLeftButton = document.getElementById("move-left");
-moveLeftButton.addEventListener("click", () => {
+moveLeftButton.addEventListener("mousedown", () => {
     handleArrowKey(37); // Simulate the left arrow key press
 });
+*/
 
-const moveRightButton = document.getElementById("move-right");
-moveRightButton.addEventListener("click", () => {
-    handleArrowKey(39); // Simulate the right arrow key press
+const moveLeftButton = document.getElementById("move-left");
+let isMouseDownLeft = false;
+
+moveLeftButton.addEventListener("mousedown", () => {
+    isMouseDownLeft = true;
+
+    // Start the action immediately when the mouse button is pressed
+    handleArrowKey(37);
+
+    // Repeatedly perform the action as long as the mouse button is held down
+    const intervalIdLeft = setInterval(() => {
+        if (isMouseDownLeft) {
+            handleArrowKey(37); // Simulate the left arrow key press
+        } else {
+            clearInterval(intervalIdLeft); // Stop the action when the mouse button is released
+        }
+    }, 100); // Adjust the interval duration as needed
 });
 
+moveLeftButton.addEventListener("mouseup", () => {
+    isMouseDownLeft = false;
+});
+
+
+/*
+const moveRightButton = document.getElementById("move-right");
+moveRightButton.addEventListener("mousedown", () => {
+    handleArrowKey(39); // Simulate the right arrow key press
+});
+*/
+
+const moveRightButton = document.getElementById("move-right");
+let isMouseDownRight = false;
+
+moveRightButton.addEventListener("mousedown", () => {
+    isMouseDownRight = true;
+
+    // Start the action immediately when the mouse button is pressed
+    handleArrowKey(39);
+
+    // Repeatedly perform the action as long as the mouse button is held down
+    const intervalIdRight = setInterval(() => {
+        if (isMouseDownRight) {
+            handleArrowKey(39); // Simulate the right arrow key press
+        } else {
+            clearInterval(intervalIdRight); // Stop the action when the mouse button is released
+        }
+    }, 100); // Adjust the interval duration as needed
+});
+
+moveRightButton.addEventListener("mouseup", () => {
+    isMouseDownRight = false;
+});
+
+
+
+
+// till here
 // Button event listener to simulate firing a projectile (Rotate CCW)
+
+/*
 const rotateCCWButton = document.getElementById("rotate-ccw");
 rotateCCWButton.addEventListener("click", () => {
     // Simulate the Spacebar press to fire a projectile
@@ -152,6 +269,53 @@ rotateCCWButton.addEventListener("click", () => {
     // Move the projectile in the direction of the player's rotation
     moveProjectile(projectile, xSpeed, ySpeed);
 });
+*/
+
+// try
+const rotateCCWButton = document.getElementById("rotate-ccw");
+let isMouseDownCCW = false;
+
+rotateCCWButton.addEventListener("mousedown", () => {
+    isMouseDownCCW = true;
+
+    // Continuously perform the action as long as the mouse button is held down
+    const intervalIdCCW = setInterval(() => {
+        if (!isMouseDownCCW) {
+            clearInterval(intervalIdCCW); // Stop the action when the mouse button is released
+        } else {
+            // Simulate the Spacebar press to fire a projectile
+            const radians = (playerRotation * Math.PI) / 180;
+            const projectile = document.createElement("div");
+            projectile.className = "projectile";
+
+            // Calculate the initial position of the projectile relative to the player's center
+            const projectileRadius = 5; // Adjust the radius of the projectile as needed
+            const projectileX = playerX  - projectileRadius;
+            const projectileY = playerY - projectileRadius;
+
+            projectile.style.left = `${projectileX}px`;
+            projectile.style.top = `${projectileY}px`;
+
+            // Calculate the speed components based on player rotation
+            const xSpeed = projectileSpeed * Math.cos(radians); // Adjust the sign here
+            const ySpeed = projectileSpeed * Math.sin(radians); // Adjust the sign here
+
+            // Append the projectile to the container
+            projectileContainer.appendChild(projectile);
+
+            // Move the projectile in the direction of the player's rotation
+            moveProjectile(projectile, xSpeed, ySpeed);
+        }
+    }, 100); // Adjust the interval duration as needed
+});
+
+// Stop the action when the mouse button is released
+rotateCCWButton.addEventListener("mouseup", () => {
+    isMouseDownCCW = false;
+});
+
+
+//try
 
 const rotateCWButton = document.getElementById("rotate-cw");
 rotateCWButton.addEventListener("click", () => {
@@ -178,6 +342,52 @@ function moveProjectile(projectile, xSpeed, ySpeed) {
         }
     }, 16); // Adjust the interval for smoother movement
 }
+
+/*
+// this is again try
+function component(width, height, color, x, y) {
+  this.width = width;
+  this.height = height;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.x = x;
+  this.y = y;
+  this.update = function() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+  this.newPos = function() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
+}
+
+function updateGameArea() {
+  myGameArea.clear();
+  myGamePiece.newPos();
+  myGamePiece.update();
+}
+
+
+function moveup() {
+  myGamePiece.speedY -= 1;
+}
+
+function movedown() {
+  myGamePiece.speedY += 1;
+}
+
+function moveleft() {
+  myGamePiece.speedX -= 1;
+}
+
+function moveright() {
+  myGamePiece.speedX += 1;
+}
+*/
+// try ends here
+
 
 updateArrowIndicatorRotation(playerRotation);
 updatePlayerPosition();
