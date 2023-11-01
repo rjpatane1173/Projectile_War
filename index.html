@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <title>Mobile Game Controls</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,6 +21,40 @@
         <div class="obstacle obstacle4"></div>
         <div id="reloading-message">Reloading...</div>
         <div id="projectiles-lefts-counter"></div>
+        <div id="enemies-killed-counter">Enemies Killed: </div>
+
+
+        <div id="timer" class="timer">Time Left: <span id="timer-display">--:--</span></div>
+        <div id="result-popup" class="modal">
+    <div class="modal-content">
+        <h2>Game Over</h2>
+        <p id="enemies-killed-text">Max Players Killed: --</p>
+        <button id="restart-button">Restart</button>
+    </div>
+</div>
+
+
+
+        <!-- Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <h2>Choose Game Duration</h2>
+        <select id="duration">
+            <option value="20">2 minutes</option>
+            <option value="300">5 minutes</option>
+            <option value="600">10 minutes</option>
+        </select>
+        <button id="start-button">Start Game</button>
+    </div>
+</div>
+
+
+        <!-- Enemy squares -->
+        <div class="enemy" id="enemy1"></div>
+        <div class="enemy" id="enemy2"></div>
+        <div class="enemy" id="enemy3"></div>
+        <div class="enemy" id="enemy4"></div>
+        <div class="enemy" id="enemy5"></div>
     </div>
 
 <div id="controls">
@@ -31,5 +67,6 @@
 </div>
 
     <script src="game.js"></script>
+
 </body>
 </html>
