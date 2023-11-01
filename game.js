@@ -10,22 +10,219 @@ let reloading = false; // Flag to indicate reloading state
 const reloadingTime = 1500; // 1.5 seconds in milliseconds
 const reloadingMessage = document.getElementById("reloading-message");
 const projectilesLeftCounter = document.getElementById("projectiles-lefts-counter");
+let enemiesKilled = 0;
+const enemiesKilledCounter = document.getElementById("enemies-killed-counter");
+
+// try to add timer and display result start
+// try to add timer and display result start
 
 
-// try start for displaying projectles left for reloading
+const modal = document.getElementById("myModal");
+const durationSelect = document.getElementById("duration");
+const startButton = document.getElementById("start-button");
+
+// Display the modal when the page loads
+modal.style.display = "block";
+
+startButton.addEventListener("click", () => {
+    const gameDuration = parseInt(durationSelect.value);
+    modal.style.display = "none"; // Hide the modal
+    startGameCountdown(gameDuration);
+    startButton.disabled = true;
+    durationSelect.disabled = true;
+});
 
 
-projectilesLeftCounter.textContent = `Projectiles Left: ${maxProjectiles}`;
-projectilesLeftCounter.style.display = "block";
-// Add an event listener for the "R" key (for resetting the projectile array)
+const timerDisplay = document.getElementById("timer-display");
+const gameDurationSelect = document.getElementById("duration");
+const timerContainer = document.getElementById("timer");
+let gameDuration = parseInt(gameDurationSelect.value);
+let timer;
+
+gameDurationSelect.addEventListener("change", () => {
+    gameDuration = parseInt(gameDurationSelect.value);
+});
+
+function startGameCountdown(duration) {
+    clearInterval(timer);
+    const endTime = Date.now() + duration * 1000;
+
+    function updateTimerDisplay() {
+        const currentTime = Math.max(0, endTime - Date.now());
+        const minutes = Math.floor(currentTime / 60000);
+        const seconds = Math.floor((currentTime % 60000) / 1000);
+
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        if (currentTime <= 30000) {
+            timerContainer.classList.add("timer-red");
+        }
+
+        if (currentTime <= 0) {
+            clearInterval(timer);
+            showResult();
+        }
+    }
+
+    updateTimerDisplay(); // Initialize the timer display
+    timer = setInterval(updateTimerDisplay, 1000); // Update the timer every second
+}
+
+function showResult() {
+    // Implement the logic to display the results (e.g., enemies killed)
+    const resultPopup = document.getElementById("result-popup");
+    const enemiesKilledText = document.getElementById("enemies-killed-text");
+
+    // Calculate the number of enemies killed
+    const maxEnemiesKilled = 10; // Replace with the actual number
+    enemiesKilledText.textContent = `Max Players Killed: ${enemiesKilled}`;
+    resultPopup.style.display = "block";
+}
+const restartButton = document.getElementById("restart-button");
+
+restartButton.addEventListener("click", () => {
+    // Reset the game or navigate to the game setup screen
+    location.reload(); // Refresh the page to restart the game
+});
+
+
+// try to add timer and display result start
+// try to add timer and display result start
+
+
+
+
+
+
+
+const enemyElements = [];
+// Function to generate random non-overlapping coordinates for enemies
+function generateRandomCoordinates() {
+    const enemyWidth = 30; // Adjust the width of the enemy square as needed
+    const enemyHeight = 30; // Adjust the height of the enemy square as needed
+    const margin = 10; // Adjust the margin to ensure no overlap
+
+    let x, y;
+    let validLocation = false;
+
+    while (!validLocation) {
+        x = Math.random() * (gameContainer.clientWidth - enemyWidth);
+        y = Math.random() * (gameContainer.clientHeight - enemyHeight);
+
+        // Check for overlaps with obstacles
+        let obstacleOverlap = false;
+        obstacles.forEach((obstacle) => {
+            const obstacleRect = obstacle.getBoundingClientRect();
+            if (
+                x + enemyWidth + margin > obstacleRect.left &&
+                x - margin < obstacleRect.right &&
+                y + enemyHeight + margin > obstacleRect.top &&
+                y - margin < obstacleRect.bottom
+            ) {
+                obstacleOverlap = true;
+            }
+        });
+
+        // Check for overlaps with the player
+        const playerRect = player.getBoundingClientRect();
+        if (
+            x + enemyWidth + margin > playerRect.left &&
+            x - margin < playerRect.right &&
+            y + enemyHeight + margin > playerRect.top &&
+            y - margin < playerRect.bottom
+        ) {
+            obstacleOverlap = true;
+        }
+
+        // Check for overlaps with other enemies
+        let enemyOverlap = false;
+        enemies.forEach((enemy) => {
+            const enemyRect = enemy.getBoundingClientRect();
+            if (
+                x + enemyWidth + margin > enemyRect.left &&
+                x - margin < enemyRect.right &&
+                y + enemyHeight + margin > enemyRect.top &&
+                y - margin < enemyRect.bottom
+            ) {
+                enemyOverlap = true;
+            }
+        });
+
+        // If no overlaps, it's a valid location
+        if (!obstacleOverlap && !enemyOverlap) {
+            validLocation = true;
+        }
+    }
+
+    return { x, y };
+}
+
+
+const enemies = [];
+
+// Create and append enemy squares
+for (let i = 0; i < 5; i++) {
+    const enemy = document.createElement("div");
+    enemy.className = "enemy";
+    const { x, y } = generateRandomCoordinates();
+    enemy.style.left = `${x}px`;
+    enemy.style.top = `${y}px`;
+    gameContainer.appendChild(enemy);
+        
+    // add the elemrnts to enemyElemts array
+    enemyElements.push(enemy);
+}
+// try start 
+function spawnEnemies(count) {
+    for (let i = 0; i < count; i++) {
+        const enemy = document.createElement("div");
+        enemy.className = "enemy";
+        const { x, y } = generateRandomCoordinates();
+        enemy.style.left = `${x}px`;
+        enemy.style.top = `${y}px`;
+        gameContainer.appendChild(enemy);
+        enemyElements.push(enemy);
+    }
+}
+
+// try ends
+
+// Function to check if a projectile hits an enemy
+function checkProjectileEnemyCollision() {
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        const projectile = projectiles[i];
+        const projectileRect = projectile.getBoundingClientRect();
+
+        for (let j = enemyElements.length - 1; j >= 0; j--) {
+            const enemy = enemyElements[j];
+            const enemyRect = enemy.getBoundingClientRect();
+
+            if (
+                projectileRect.left < enemyRect.right &&
+                projectileRect.right > enemyRect.left &&
+                projectileRect.top < enemyRect.bottom &&
+                projectileRect.bottom > enemyRect.top
+            ) {
+                // Collision detected with an enemy
+
+                enemiesKilled++;     // to display the scroe
+                enemiesKilledCounter.textContent = `Enemies Killed: ${enemiesKilled}`;
+                // Remove the projectile and enemy
+                projectileContainer.removeChild(projectile);
+                projectiles.splice(i, 1);
+
+                gameContainer.removeChild(enemy);
+                enemyElements.splice(j, 1);
+            }
+        }
+    }
+}
+
+// try for enemy swapning and killing ends here
+
 
 
 // Add a counter element for displaying the number of projectiles left
-
-
-// try end for displaying projectles left for reloading
-
-
 let playerX = 150; // Initial player position (X-coordinate) within the game container
 let playerY = 150; // Initial player position (Y-coordinate) within the game container
 const playerSpeed = 5; // Adjust the player's movement speed as needed
@@ -94,7 +291,7 @@ function handleArrowKey(keyCode) {
                 playerX -= playerSpeed; // Move left
                 updatePlayerPosition();
                 updateArrowIndicatorPosition();
-                checkCollisions();
+                
 
             }
             break;
@@ -131,7 +328,10 @@ function handleArrowKey(keyCode) {
                 updateArrowIndicatorPosition();
             }
             break;
+
     }
+        updatePlayerPosition();
+        updateArrowIndicatorPosition();
 }
 
 
@@ -432,11 +632,7 @@ function moveProjectile(projectile, xSpeed, ySpeed) {
 }
 
 
-updateArrowIndicatorRotation(playerRotation);
-updatePlayerPosition();
-updateArrowIndicatorPosition();
-checkProjectileObstacleCollision(); // Check for projectile-obstacle collisions
-requestAnimationFrame(gameLoop); // Continue the loop
+
 
 
 // try start 10 oct
@@ -448,7 +644,13 @@ function gameLoop() {
     updatePlayerPosition();
     updateArrowIndicatorPosition();
     checkProjectileObstacleCollision(); // Check for projectile-obstacle collisions
-    // ... Other game-related logic ...
+    checkProjectileEnemyCollision(); // Check for projectile-enemy collisions
+
+
+    if (enemyElements.length <= 3) {
+        spawnEnemies(2); // Spawn 2 new enemies
+    }
+
 
     requestAnimationFrame(gameLoop); // Continue the loop
 }
