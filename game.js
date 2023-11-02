@@ -13,8 +13,60 @@ const projectilesLeftCounter = document.getElementById("projectiles-lefts-counte
 let enemiesKilled = 0;
 const enemiesKilledCounter = document.getElementById("enemies-killed-counter");
 
-// try to add timer and display result start
-// try to add timer and display result start
+// try 2 nov
+rotateCCWButton.addEventListener("mousedown", () => {
+  isMouseDownCCW = true;
+  fireProjectile(); // Fire a projectile when the mouse button is pressed
+});
+
+function fireProjectile() {
+  const radians = (playerRotation * Math.PI) / 180;
+  const projectile = document.createElement("div");
+  projectile.className = "projectile";
+
+  // Calculate the initial position of the projectile relative to the player's center
+  const projectileRadius = 5; // Adjust the radius of the projectile as needed
+  const projectileX = playerX - projectileRadius;
+  const projectileY = playerY - projectileRadius;
+  projectile.style.left = `${projectileX}px`;
+  projectile.style.top = `${projectileY}px`;
+
+  // Calculate the speed components based on player rotation
+  const xSpeed = projectileSpeed * Math.cos(radians);
+  const ySpeed = projectileSpeed * Math.sin(radians);
+
+  // Append the projectile to the container
+  projectileContainer.appendChild(projectile);
+
+  // Move the projectile in the direction of the player's rotation
+  moveProjectile(projectile, xSpeed, ySpeed);
+}
+
+// Function to check if a projectile hits an enemy
+function checkProjectileEnemyCollision(projectile) {
+  const projectileRect = projectile.getBoundingClientRect();
+  for (let j = enemyElements.length - 1; j >= 0; j--) {
+    const enemy = enemyElements[j];
+    const enemyRect = enemy.getBoundingClientRect();
+    if (
+      projectileRect.left < enemyRect.right &&
+      projectileRect.right > enemyRect.left &&
+      projectileRect.top < enemyRect.bottom &&
+      projectileRect.bottom > enemyRect.top
+    ) {
+      // Collision detected with an enemy
+      enemiesKilled++; // Update the score
+      enemiesKilledCounter.textContent = `Enemies Killed: ${enemiesKilled}`;
+      // Remove the projectile and enemy
+      projectileContainer.removeChild(projectile);
+      projectiles.splice(projectiles.indexOf(projectile), 1);
+      gameContainer.removeChild(enemy);
+      enemyElements.splice(j, 1);
+    }
+  }
+}
+
+//try 2 nov
 
 
 const modal = document.getElementById("myModal");
