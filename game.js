@@ -539,7 +539,7 @@ moveRightButton.addEventListener("mouseup", () => {
 
 
 //try start for fire button 11:20pm
-const rotateCCWButton = document.getElementById("rotate-ccw");
+const rotateCCWButton = document.getElementById("fire");
 let isMouseDownCCW = false;
 let isTouchStartCCW = false;
 
