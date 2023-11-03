@@ -543,7 +543,7 @@ const rotateCCWButton = document.getElementById("rotate-ccw");
 let isMouseDownCCW = false;
 let isTouchStartCCW = false;
 
-rotateCCWButton.addEventListener("touch", (event) => {
+rotateCCWButton.addEventListener("touchstart", (event) => {
     event.preventDefault(); // Prevent default touch behavior
     isTouchStartCCW = true;
     startRotation(); // Start rotation when touch starts
