@@ -1,76 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-    <title>Mobile Game Controls</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Obstacle Shooter Game</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div id="game-container">
-        <div id="player"></div>
-        <div id="arrow-indicator">></div>
-        <div id="projectile-container"></div>
-        <!-- 'L'-shaped obstacles -->
-        <div class="obstacle obstacle1"></div>
-        <div class="obstacle obstacle2"></div>
-        <div class="obstacle obstacle3"></div>
-        <div class="obstacle obstacle4"></div>
-        <div id="reloading-message">Reloading...</div>
-        <div id="projectiles-lefts-counter"></div>
-        <div id="enemies-killed-counter">Enemies Killed: </div>
+      <div id="player"></div>
+      <div id="arrow-indicator">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Adjusted path to be perfectly centered -->
+          <path
+            d="M12 4L18 12L12 20"
+            stroke="#FF5722"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <div id="projectile-container"></div>
 
+      <!-- Obstacles -->
+      <div class="obstacle obstacle1"></div>
+      <div class="obstacle obstacle2"></div>
+      <div class="obstacle obstacle3"></div>
+      <div class="obstacle obstacle4"></div>
 
-        <div id="timer" class="timer">Time Left: <span id="timer-display">--:--</span></div>
-        <div id="result-popup" class="modal">
-    <div class="modal-content">
-        <h2>Game Over</h2>
-        <p id="enemies-killed-text">Max Players Killed: --</p>
-        <button id="restart-button">Restart</button>
+      <!-- UI Elements -->
+      <div class="ui-container">
+        <div id="reloading-message">
+          <div class="reloading-animation"></div>
+          <span>RELOADING</span>
+        </div>
+        <div id="ammo-counter">
+          <div class="ammo-icon"></div>
+          <span>12/12</span>
+        </div>
+        <div id="score-display">
+          <div class="score-icon"></div>
+          <span>0</span>
+        </div>
+        <div id="timer">
+          <div class="timer-icon"></div>
+          <span>02:00</span>
+        </div>
+      </div>
+
+      <!-- Game Over Modal -->
+      <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>MISSION FAILED</h2>
+            <div class="header-decoration"></div>
+          </div>
+          <div class="modal-body">
+            <div class="score-display">
+              <p>YOUR SCORE</p>
+              <p id="final-score">0</p>
+            </div>
+            <p id="high-score-message">NEW HIGH SCORE!</p>
+            <div id="high-scores-container">
+              <h3>LEADERBOARD</h3>
+              <div class="leaderboard-decoration"></div>
+              <div id="high-scores-list"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="restart-button" class="neon-button">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              RETRY
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Menu -->
+      <div id="start-menu" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1>OBSTACLE SHOOTER</h1>
+            <div class="header-decoration"></div>
+          </div>
+          <div class="modal-body">
+            <div class="controls-info">
+              <div class="control-item">
+                <div class="control-icon move-icon"></div>
+                <span>MOVEMENT</span>
+              </div>
+              <div class="control-item">
+                <div class="control-icon fire-icon"></div>
+                <span>FIRE</span>
+              </div>
+              <div class="control-item">
+                <div class="control-icon reload-icon"></div>
+                <span>RELOAD</span>
+              </div>
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                id="player-name"
+                placeholder="ENTER CALLSIGN"
+                maxlength="15"
+              />
+            </div>
+            <div class="input-group">
+              <select id="game-duration">
+                <option value="120">2 MINUTES</option>
+                <option value="300">5 MINUTES</option>
+                <option value="600">10 MINUTES</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="start-button" class="neon-button">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              DEPLOY
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
 
-
-
-        <!-- Modal -->
-<div id="myModal" class="modal">
-    <div class="modal-content">
-        <h2>Welcome To The Game </h2>
-        <h2>• Remember Arrows To Control The Movement</h2>
-        <h2>• Spacebar To Fire Projectiles</h2>
-        <h2>• R To Relaod The Gun</h2>
-        <h2>Choose Game Duration</h2>
-        <select id="duration">
-            <option value="120">2 minutes</option>
-            <option value="300">5 minutes</option>
-            <option value="600">10 minutes</option>
-        </select>
-        <button id="start-button">Start Game</button>
+    <!-- Mobile Controls -->
+    <div id="controls">
+      <div class="movement-controls">
+        <button id="move-up" class="control-btn">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 19V5M5 12L12 5L19 12"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <div class="middle-row">
+          <button id="move-left" class="control-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 12H5M12 19L5 12L12 5"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <button id="move-down" class="control-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 5V19M5 12L12 19L19 12"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <button id="move-right" class="control-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12H19M12 5L19 12L12 19"
+                stroke="white"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="action-controls">
+        <button id="fire-button" class="control-btn action-btn">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17 9V17C17 19 15 21 13 21H11C9 21 7 19 7 17V9C7 5 9 3 13 3H15"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M12 6V12L14 14"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+        <button id="reload-button" class="control-btn action-btn">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C14.3052 3 16.4078 3.86683 18 5.29146M21 3V6.6H17.4"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
-</div>
-
-
-        <!-- Enemy squares -->
-        <div class="enemy" id="enemy1"></div>
-        <div class="enemy" id="enemy2"></div>
-        <div class="enemy" id="enemy3"></div>
-        <div class="enemy" id="enemy4"></div>
-        <div class="enemy" id="enemy5"></div>
-    </div>
-
-<div id="controls">
-        <button id="move-up">Up</button>
-        <button id="move-down">Down</button>
-        <button id="move-left">Left</button>
-        <button id="move-right">Right</button>
-        <button id="rotate-ccw">Fire</button>
-        <button id="rotate-cw">Rotate CW</button>
-</div>
 
     <script src="game.js"></script>
-
-</body>
+  </body>
 </html>
