@@ -51,8 +51,105 @@ const elements = {
     moveLeftBtn: document.getElementById('move-left'),
     moveRightBtn: document.getElementById('move-right'),
     fireBtn: document.getElementById('fire-button'),
-    reloadBtn: document.getElementById('reload-button')
+    reloadBtn: document.getElementById('reload-button'),
+    joystick: document.getElementById('joystick'),
+    joystickBase: document.getElementById('joystick-base')
 };
+
+// Virtual Joystick Variables
+let joystickActive = false;
+const joystickRadius = 60;
+const joystickCenter = { x: 0, y: 0 };
+
+function setupJoystick() {
+    // Get initial position
+    const baseRect = elements.joystickBase.getBoundingClientRect();
+    joystickCenter.x = baseRect.left + baseRect.width / 2;
+    joystickCenter.y = baseRect.top + baseRect.height / 2;
+
+    // Touch events
+    elements.joystick.addEventListener('touchstart', handleJoystickStart);
+    document.addEventListener('touchmove', handleJoystickMove);
+    document.addEventListener('touchend', handleJoystickEnd);
+
+    // Mouse events (for testing on desktop)
+    elements.joystick.addEventListener('mousedown', handleJoystickStart);
+    document.addEventListener('mousemove', handleJoystickMove);
+    document.addEventListener('mouseup', handleJoystickEnd);
+}
+
+function handleJoystickStart(e) {
+    e.preventDefault();
+    joystickActive = true;
+    // Reset all directions
+    Object.keys(gameState.activeDirections).forEach(key => {
+        gameState.activeDirections[key] = false;
+    });
+}
+
+function handleJoystickMove(e) {
+    if (!joystickActive || !gameState.gameActive) return;
+    e.preventDefault();
+
+    const touch = e.touches ? e.touches[0] : e;
+    const touchX = touch.clientX;
+    const touchY = touch.clientY;
+
+    // Calculate distance from center
+    const dx = touchX - joystickCenter.x;
+    const dy = touchY - joystickCenter.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Limit joystick to its base
+    const angle = Math.atan2(dy, dx);
+    const limitedDistance = Math.min(distance, joystickRadius);
+    const limitedX = joystickCenter.x + Math.cos(angle) * limitedDistance;
+    const limitedY = joystickCenter.y + Math.sin(angle) * limitedDistance;
+
+    // Move joystick visually
+    elements.joystick.style.transform = `translate(calc(${limitedX - joystickCenter.x}px - 50%), calc(${limitedY - joystickCenter.y}px - 50%))`;
+
+    // Calculate direction (deadzone of 20px)
+    if (limitedDistance > 20) {
+        // Determine primary direction
+        const angleDeg = (angle * 180 / Math.PI + 360) % 360;
+        
+        // Reset all directions
+        Object.keys(gameState.activeDirections).forEach(key => {
+            gameState.activeDirections[key] = false;
+        });
+
+        // Set active directions based on angle
+        if (angleDeg >= 45 && angleDeg < 135) {
+            gameState.activeDirections.down = true; // Down
+        } else if (angleDeg >= 135 && angleDeg < 225) {
+            gameState.activeDirections.left = true; // Left
+        } else if (angleDeg >= 225 && angleDeg < 315) {
+            gameState.activeDirections.up = true; // Up
+        } else {
+            gameState.activeDirections.right = true; // Right
+        }
+    } else {
+        // Reset all directions if in deadzone
+        Object.keys(gameState.activeDirections).forEach(key => {
+            gameState.activeDirections[key] = false;
+        });
+    }
+}
+
+function handleJoystickEnd(e) {
+    if (!joystickActive) return;
+    e.preventDefault();
+    
+    // Reset joystick position
+    elements.joystick.style.transform = 'translate(-50%, -50%)';
+    joystickActive = false;
+    
+    // Reset all directions
+    Object.keys(gameState.activeDirections).forEach(key => {
+        gameState.activeDirections[key] = false;
+    });
+}
 
 // Load high scores from localStorage
 function loadHighScores() {
@@ -100,6 +197,10 @@ function initGame() {
     gameState.score = 0;
     gameState.gameActive = true;
     gameState.lastEnemySpawn = 0;
+    
+    // Reset joystick position
+    elements.joystick.style.transform = 'translate(-50%, -50%)';
+    joystickActive = false;
     
     // Reset active directions
     Object.keys(gameState.activeDirections).forEach(key => {
@@ -683,6 +784,9 @@ function setupEventListeners() {
         initGame();
         startGameTimer();
     });
+
+    // Setup joystick
+    setupJoystick();
 }
 
 // Initialize
