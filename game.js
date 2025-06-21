@@ -1,3 +1,8 @@
+// Mobile detection
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 // Game State
 const gameState = {
     playerName: '',
@@ -5,7 +10,10 @@ const gameState = {
     currentHighScore: 0,
     playerX: window.innerWidth / 2,
     playerY: window.innerHeight / 2,
-    playerSpeed: 5,
+    basePlayerSpeed: 5,  // Base speed that will be adjusted
+    get playerSpeed() {  // Computed property based on device
+        return isMobileDevice() ? this.basePlayerSpeed * 0.6 : this.basePlayerSpeed;
+    },
     rotation: 0,
     projectiles: [],
     enemies: [],
@@ -478,11 +486,15 @@ function spawnEnemy() {
     enemy.style.top = `${y}px`;
     elements.gameContainer.appendChild(enemy);
     
+    // Adjust enemy speed based on device
+    const baseSpeed = 1 + Math.random() * 2;
+    const adjustedSpeed = isMobileDevice() ? baseSpeed * 0.7 : baseSpeed;
+    
     gameState.enemies.push({
         element: enemy,
         x,
         y,
-        speed: 1 + Math.random() * 2
+        speed: adjustedSpeed
     });
 }
 
