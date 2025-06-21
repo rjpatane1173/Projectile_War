@@ -67,8 +67,8 @@ body {
     z-index: 11;
     filter: drop-shadow(0 0 5px var(--secondary-color));
     pointer-events: none;
-    
 }
+
 .projectile {
     position: absolute;
     width: 8px;
@@ -130,6 +130,41 @@ body {
     bottom: 10%; 
     width: 15px; 
     height: 30%; 
+}
+
+/* Virtual Joystick */
+#joystick-container {
+    position: fixed;
+    left: 50px;
+    bottom: 50px;
+    width: 120px;
+    height: 120px;
+    z-index: 100;
+    display: none;
+}
+
+#joystick-base {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgba(26, 26, 46, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+#joystick {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(0, 255, 157, 0.5);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+    touch-action: none;
 }
 
 /* UI Elements */
@@ -221,7 +256,7 @@ body {
 }
 
 .movement-controls {
-    display: flex;
+    display: none; /* Hidden by default - shown only on desktop */
     flex-direction: column;
     align-items: center;
 }
@@ -271,6 +306,46 @@ body {
     background-color: rgba(255, 45, 117, 0.6);
     box-shadow: 0 0 15px rgba(255, 45, 117, 0.6);
     transform: scale(0.95);
+}
+
+/* Show joystick on mobile and hide directional buttons */
+@media (max-width: 768px) {
+    #joystick-container {
+        display: block;
+    }
+    .movement-controls {
+        display: none !important;
+    }
+    #controls {
+        justify-content: flex-end; /* Push action buttons to the right */
+        padding-right: 30px;
+    }
+
+    .action-controls {
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 20px; /* Add some space between buttons and screen bottom */
+    }
+
+    .control-btn {
+        width: 55px;
+        height: 55px;
+    }
+
+    .action-btn {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Show directional buttons on desktop and hide joystick */
+@media (min-width: 769px) {
+    .movement-controls {
+        display: flex;
+    }
+    #joystick-container {
+        display: none;
+    }
 }
 
 /* Modals */
