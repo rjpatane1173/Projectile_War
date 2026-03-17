@@ -32,7 +32,15 @@ const gameState = {
         down: false,
         left: false,
         right: false
-    }
+    },
+    blastCharging: false,
+    blastReady: false,
+    blastChargeStart: 0,
+    blastChargeTime: 4000, // 4 seconds in milliseconds
+    blastRadius: 150, // Radius of blast effect
+    blastCooldown: false,
+    lastBlastTime: 0,
+    blastCooldownTime: 1000 // 1 second cooldown after blast
 };
 
 // DOM Elements
@@ -61,7 +69,8 @@ const elements = {
     fireBtn: document.getElementById('fire-button'),
     reloadBtn: document.getElementById('reload-button'),
     joystick: document.getElementById('joystick'),
-    joystickBase: document.getElementById('joystick-base')
+    joystickBase: document.getElementById('joystick-base'),
+    blastIndicator: null
 };
 
 // Virtual Joystick Variables
@@ -205,6 +214,19 @@ function initGame() {
     gameState.score = 0;
     gameState.gameActive = true;
     gameState.lastEnemySpawn = 0;
+    // Reset blast state
+    gameState.blastCharging = false;
+    gameState.blastReady = false;
+    gameState.blastCooldown = false;
+    gameState.lastBlastTime = 0;
+    
+    // Create blast indicator if it doesn't exist
+    if (!elements.blastIndicator) {
+        createBlastIndicator();
+    }
+    
+    // Update blast indicator
+    updateBlastIndicator();
     
     // Reset joystick position
     elements.joystick.style.transform = 'translate(-50%, -50%)';
@@ -263,7 +285,11 @@ function gameLoop(timestamp) {
     
     // Check collisions
     checkCollisions();
-    
+
+    // Update blast indicator (for progress animation)
+    if (gameState.blastCharging) {
+        updateBlastIndicator();
+    }
     // Update UI
     updatePlayerPosition();
     
@@ -649,6 +675,181 @@ function startGameTimer() {
     
     updateTimer();
 }
+
+function createBlastIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'blast-indicator';
+    indicator.innerHTML = `
+        <div class="blast-icon">💥</div>
+        <div class="blast-progress-container">
+            <div class="blast-progress-bar"></div>
+        </div>
+        <div class="blast-status">READY</div>
+    `;
+    document.getElementById('game-container').appendChild(indicator);
+    elements.blastIndicator = indicator;
+}
+
+function updateBlastIndicator() {
+    if (!elements.blastIndicator) return;
+    
+    const indicator = elements.blastIndicator;
+    const progressBar = indicator.querySelector('.blast-progress-bar');
+    const statusText = indicator.querySelector('.blast-status');
+    
+    if (gameState.blastReady) {
+        statusText.textContent = 'READY';
+        statusText.style.color = 'var(--primary-color)';
+        progressBar.style.width = '100%';
+        indicator.classList.add('ready');
+    } else if (gameState.blastCharging) {
+        const elapsed = Date.now() - gameState.blastChargeStart;
+        const progress = Math.min(100, (elapsed / gameState.blastChargeTime) * 100);
+        progressBar.style.width = `${progress}%`;
+        statusText.textContent = `CHARGING ${Math.floor(progress)}%`;
+        statusText.style.color = 'var(--accent-color)';
+        indicator.classList.remove('ready');
+    } else {
+        statusText.textContent = 'READY';
+        statusText.style.color = 'var(--primary-color)';
+        progressBar.style.width = '0%';
+        indicator.classList.remove('ready');
+    }
+}
+
+// Blast ability function
+function activateBlast() {
+    // Check if blast is ready and game is active
+    if (!gameState.blastReady || !gameState.gameActive || gameState.blastCooldown) return;
+    
+    // Get player position
+    const playerX = gameState.playerX + 15; // Center of player
+    const playerY = gameState.playerY + 15;
+    
+    // Create blast visual effect
+    createBlastEffect(playerX, playerY);
+    
+    // Find and destroy enemies within radius
+    const enemiesToRemove = [];
+    
+    gameState.enemies.forEach((enemy, index) => {
+        const enemyX = enemy.x + 15; // Center of enemy
+        const enemyY = enemy.y + 15;
+        
+        // Calculate distance from player
+        const dx = enemyX - playerX;
+        const dy = enemyY - playerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // If enemy is within blast radius, mark for removal
+        if (distance <= gameState.blastRadius) {
+            enemiesToRemove.push(index);
+            
+            // Add score for each destroyed enemy
+            gameState.score += 5; // Small points per enemy (adjust as needed)
+            
+            // Create mini explosion effect on enemy
+            createMiniExplosion(enemy.x, enemy.y);
+        }
+    });
+    
+    // Remove enemies from farthest to nearest to avoid index issues
+    for (let i = enemiesToRemove.length - 1; i >= 0; i--) {
+        const index = enemiesToRemove[i];
+        const enemy = gameState.enemies[index];
+        
+        // Remove enemy element
+        if (enemy.element && enemy.element.parentNode) {
+            enemy.element.parentNode.removeChild(enemy.element);
+        }
+        
+        // Remove from array
+        gameState.enemies.splice(index, 1);
+    }
+    
+    // Update score display
+    updateScoreDisplay();
+    
+    // Set blast on cooldown
+    gameState.blastReady = false;
+    gameState.blastCharging = false;
+    gameState.blastCooldown = true;
+    gameState.lastBlastTime = Date.now();
+    
+    // Update indicator
+    updateBlastIndicator();
+    
+    // Reset cooldown after 1 second
+    setTimeout(() => {
+        gameState.blastCooldown = false;
+    }, gameState.blastCooldownTime);
+}
+
+// Create visual blast effect
+function createBlastEffect(x, y) {
+    const blast = document.createElement('div');
+    blast.className = 'blast-effect';
+    blast.style.left = `${x - gameState.blastRadius}px`;
+    blast.style.top = `${y - gameState.blastRadius}px`;
+    blast.style.width = `${gameState.blastRadius * 2}px`;
+    blast.style.height = `${gameState.blastRadius * 2}px`;
+    document.getElementById('game-container').appendChild(blast);
+    
+    // Remove after animation
+    setTimeout(() => {
+        if (blast.parentNode) {
+            blast.parentNode.removeChild(blast);
+        }
+    }, 600);
+}
+
+// Create mini explosion for each destroyed enemy
+function createMiniExplosion(x, y) {
+    const explosion = document.createElement('div');
+    explosion.className = 'mini-explosion';
+    explosion.style.left = `${x}px`;
+    explosion.style.top = `${y}px`;
+    document.getElementById('game-container').appendChild(explosion);
+    
+    setTimeout(() => {
+        if (explosion.parentNode) {
+            explosion.parentNode.removeChild(explosion);
+        }
+    }, 300);
+}
+
+// Add to keyboard event listener (around line 400-420)
+document.addEventListener('keydown', (e) => {
+    if (!gameState.gameActive) return;
+    
+    switch (e.key) {
+        // ... existing cases ...
+        case 'b':
+        case 'B':
+            // Start charging blast if not already charging or on cooldown
+            if (!gameState.blastCharging && !gameState.blastReady && !gameState.blastCooldown) {
+                gameState.blastCharging = true;
+                gameState.blastChargeStart = Date.now();
+                updateBlastIndicator();
+                
+                // Set timeout for blast to become ready
+                setTimeout(() => {
+                    if (gameState.blastCharging && gameState.gameActive) {
+                        gameState.blastCharging = false;
+                        gameState.blastReady = true;
+                        updateBlastIndicator();
+                        
+                        // Auto-activate? Or wait for another B press?
+                        // For now, we'll wait for another B press
+                    }
+                }, gameState.blastChargeTime);
+            } else if (gameState.blastReady) {
+                // If ready, activate blast
+                activateBlast();
+            }
+            break;
+    }
+});
 
 // High Score System
 function endGame() {
